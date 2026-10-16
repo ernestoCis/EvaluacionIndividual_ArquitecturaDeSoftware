@@ -72,10 +72,6 @@ public class InscripcionService {
     public Inscripcion agregarCurso(Inscripcion inscripcion, String idCurso) {
         Curso curso = cursoDAO.obtenerPorId(idCurso);
 
-        System.out.println("ID recibido por el servicio: " + idCurso);
-        System.out.println("Curso encontrado por DAO: "
-                + (curso != null ? curso.getNombre() : "No encontrado"));
-
         if (curso != null && inscripcion != null) {
             inscripcion.agregarCurso(curso);
         }
