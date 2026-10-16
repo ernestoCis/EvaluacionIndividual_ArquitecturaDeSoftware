@@ -56,5 +56,16 @@ public class Curso {
         this.costo = costo;
     }
     
-    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Curso curso = (Curso) o;
+        return id != null && id.equalsIgnoreCase(curso.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(id != null ? id.toLowerCase() : null);
+    }
 }

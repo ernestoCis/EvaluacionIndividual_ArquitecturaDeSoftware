@@ -35,7 +35,7 @@ public class InscripcionController {
     }
     
     public List<Curso> obtenerCursosDisponibles() {
-        return service.obtenerCatalogo();
+        return service.obtenerCursosDisponibles(inscripcion.getAlumno().getMatricula());
     }
     
     public void seleccionarCurso(String idCurso) {

@@ -91,15 +91,18 @@ public class Inscripcion {
     }
 
     public void agregarCurso(Curso curso) {
-        if (curso != null && !cursos.contains(curso)) {
-            cursos.add(curso);
-            calcularTotal();
+        if (curso != null) {
+            boolean yaExiste = cursos.stream().anyMatch(c -> c.getId().equalsIgnoreCase(curso.getId()));
+            if (!yaExiste) {
+                cursos.add(curso);
+                calcularTotal();
+            }
         }
     }
 
     public void eliminarCurso(Curso curso) {
-        if (curso != null && cursos.contains(curso)) {
-            cursos.remove(curso);
+        if (curso != null) {
+            cursos.removeIf(c -> c.getId().equalsIgnoreCase(curso.getId()));
             calcularTotal();
         }
     }

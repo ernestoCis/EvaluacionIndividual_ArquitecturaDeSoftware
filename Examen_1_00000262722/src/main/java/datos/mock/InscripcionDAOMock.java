@@ -31,5 +31,14 @@ public class InscripcionDAOMock implements IInscripcionDAO{
                 .orElse(null);
     }
     
-    
+    @Override
+    public List<Inscripcion> obtenerTodasPorMatricula(String matricula) {
+        List<Inscripcion> resultado = new ArrayList<>();
+        for (Inscripcion i : bdSimulada) {
+            if (i.getAlumno() != null && i.getAlumno().getMatricula().equalsIgnoreCase(matricula)) {
+                resultado.add(i);
+            }
+        }
+        return resultado;
+    }
 }

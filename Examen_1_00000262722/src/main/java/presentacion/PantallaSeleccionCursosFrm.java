@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 
+ *
  * @author jesus
  */
 public class PantallaSeleccionCursosFrm extends JFrame {
@@ -28,7 +28,7 @@ public class PantallaSeleccionCursosFrm extends JFrame {
     private DefaultTableModel modelDisponibles;
     private JTable tablaInscritos;
     private DefaultTableModel modelInscritos;
-    
+
     private JPanel panelInscritosVacio;
     private JScrollPane scrollInscritos;
     private JLabel lblTotalMonto;
@@ -105,7 +105,9 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         lblDisponibles.setForeground(new Color(15, 30, 65));
         lblDisponibles.setBorder(new EmptyBorder(0, 0, 15, 0));
 
-        String[] colsDisponibles = {"Curso", "Créditos", "Costo", "Acción"};
+        String[] colsDisponibles = {
+            "Curso", "Créditos", "Costo", "Acción", "ID"
+        };
         modelDisponibles = new DefaultTableModel(colsDisponibles, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -114,15 +116,45 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         };
 
         tablaDisponibles = new JTable(modelDisponibles);
+        tablaDisponibles.removeColumn(
+                tablaDisponibles.getColumnModel().getColumn(4)
+        );
         estilarTabla(tablaDisponibles);
 
         tablaDisponibles.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer("Agregar", azulBoton, Color.WHITE));
-        tablaDisponibles.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox(), "Agregar", (row) -> {
-            if (row >= 0 && row < listaCatalogo.size()) {
-                Curso seleccionado = listaCatalogo.get(row);
-                controller.seleccionarCurso(seleccionado.getId());
-            }
-        }));
+        tablaDisponibles.getColumnModel().getColumn(3).setCellEditor(
+                new ButtonEditor(new JCheckBox(), "Agregar", azulBoton, Color.WHITE, tablaDisponibles, (row) -> {
+                    if (row >= 0 && row < modelDisponibles.getRowCount()) {
+
+                        // Obtener el ID directamente de la fila seleccionada
+                        String idSeleccionado
+                                = modelDisponibles.getValueAt(row, 4).toString();
+
+                        Curso seleccionado = null;
+
+                        // Encontrar el objeto Curso que tiene ese ID
+                        for (Curso c : listaCatalogo) {
+                            if (c.getId().equals(idSeleccionado)) {
+                                seleccionado = c;
+                                break;
+                            }
+                        }
+
+                        if (seleccionado != null && controller != null) {
+
+                            controller.seleccionarCurso(idSeleccionado);
+
+                            // Eliminar el curso por ID de la lista
+                            listaCatalogo.removeIf(
+                                    c -> c.getId().equals(idSeleccionado)
+                            );
+
+                            // Eliminar exactamente la fila seleccionada
+                            modelDisponibles.removeRow(row);
+                        }
+                    }
+                })
+        );
 
         JScrollPane scrollDisponibles = new JScrollPane(tablaDisponibles);
         scrollDisponibles.setBorder(BorderFactory.createEmptyBorder());
@@ -158,12 +190,28 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         estilarTabla(tablaInscritos);
 
         tablaInscritos.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer("Eliminar", new Color(180, 40, 40), Color.WHITE));
-        tablaInscritos.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox(), "Eliminar", (row) -> {
-            if (row >= 0 && row < listaInscritos.size()) {
-                Curso aEliminar = listaInscritos.get(row);
-                controller.deseleccionarCurso(aEliminar.getId());
-            }
-        }));
+        tablaInscritos.getColumnModel().getColumn(3).setCellEditor(
+                new ButtonEditor(new JCheckBox(), "Eliminar", new Color(180, 40, 40), Color.WHITE, tablaInscritos, (row) -> {
+                    if (row >= 0 && row < listaInscritos.size()) {
+                        Curso aEliminar = listaInscritos.get(row);
+
+                        if (controller != null) {
+                            controller.deseleccionarCurso(aEliminar.getId());
+
+                            // Volver a agregar el curso a disponibles
+                            listaCatalogo.add(aEliminar);
+
+                            modelDisponibles.addRow(new Object[]{
+                                aEliminar.getNombre(),
+                                aEliminar.getCreditos(),
+                                monedaFormat.format(aEliminar.getCosto()),
+                                "Agregar",
+                                aEliminar.getId()
+                            });
+                        }
+                    }
+                })
+        );
 
         scrollInscritos = new JScrollPane(tablaInscritos);
         scrollInscritos.setBorder(BorderFactory.createEmptyBorder());
@@ -222,7 +270,6 @@ public class PantallaSeleccionCursosFrm extends JFrame {
     }
 
     // ==================== MÉTODOS DE DISEÑO ====================
-
     public void mostrarCatalogo(List<Curso> cursos) {
         this.listaCatalogo = cursos;
         modelDisponibles.setRowCount(0);
@@ -231,14 +278,15 @@ public class PantallaSeleccionCursosFrm extends JFrame {
                 c.getNombre(),
                 c.getCreditos(),
                 monedaFormat.format(c.getCosto()),
-                "Agregar"
+                "Agregar",
+                c.getId()
             });
         }
     }
 
     public void actualizarResumen(List<Curso> inscritos, Double total) {
         this.listaInscritos = inscritos;
-        
+
         // Actualizar Tabla de Inscritos
         modelInscritos.setRowCount(0);
         for (Curso c : inscritos) {
@@ -272,13 +320,12 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         }
     }
 
-
     private JPanel createCardPanel(Color borderCol) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(borderCol, 1, true),
-            new EmptyBorder(15, 15, 15, 15)
+                new LineBorder(borderCol, 1, true),
+                new EmptyBorder(15, 15, 15, 15)
         ));
         return panel;
     }
@@ -301,6 +348,7 @@ public class PantallaSeleccionCursosFrm extends JFrame {
 
     // Renderizador y Editor de Botones dentro de la Tabla
     private static class ButtonRenderer extends JButton implements TableCellRenderer {
+
         public ButtonRenderer(String text, Color bg, Color fg) {
             setText(text);
             setBackground(bg);
@@ -317,29 +365,56 @@ public class PantallaSeleccionCursosFrm extends JFrame {
     }
 
     private static class ButtonEditor extends DefaultCellEditor {
-        private final JButton button;
-        private final java.util.function.Consumer<Integer> action;
-        private int currentRow;
 
-        public ButtonEditor(JCheckBox checkBox, String text, java.util.function.Consumer<Integer> action) {
+        private final JButton button;
+        private final JTable table;
+        private final java.util.function.Consumer<Integer> action;
+        private int filaModelo = -1;
+
+//        private int filaModelo = -1;
+        public ButtonEditor(
+                JCheckBox checkBox,
+                String text,
+                Color bg,
+                Color fg,
+                JTable table,
+                java.util.function.Consumer<Integer> action) {
+
             super(checkBox);
+
+            this.table = table;
             this.action = action;
+
             button = new JButton(text);
             button.setFont(new Font("Arial", Font.BOLD, 11));
-            button.setBackground(new Color(0, 32, 96));
-            button.setForeground(Color.WHITE);
+            button.setBackground(bg);
+            button.setForeground(fg);
             button.setFocusPainted(false);
+
             button.addActionListener(e -> {
+                int filaSeleccionada = filaModelo;
                 fireEditingStopped();
-                action.accept(currentRow);
+
+                if (filaSeleccionada >= 0) {
+                    action.accept(filaSeleccionada);
+                }
             });
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.currentRow = row;
+        public Component getTableCellEditorComponent(
+                JTable table, Object value, boolean isSelected,
+                int row, int column) {
+
+            filaModelo = row;
+
             return button;
         }
-    }
-}
 
+        @Override
+        public Object getCellEditorValue() {
+            return button.getText();
+        }
+    }
+
+}

@@ -5,6 +5,7 @@
 package datos.dao;
 
 import datos.entidades.Inscripcion;
+import java.util.List;
 
 /**
  *
@@ -13,4 +14,5 @@ import datos.entidades.Inscripcion;
 public interface IInscripcionDAO {
     Boolean guardar(Inscripcion inscripcion);
     Inscripcion obtenerPorMatricula(String matricula);
+    List<Inscripcion> obtenerTodasPorMatricula(String matricula);
 }
