@@ -4,10 +4,14 @@
  */
 package datos.dao;
 
+import datos.entidades.Curso;
+import java.util.List;
+
 /**
  *
  * @author jesus
  */
 public interface ICursoDAO {
-    
+    List<Curso> obtenerTodos();
+    Curso obtenerPorId(String id);
 }

@@ -9,5 +9,7 @@ package datos.entidades;
  * @author jesus
  */
 public enum EstadoInscripcion {
-    EN_PROCESO, CONFIRMADA, RECHAZADA;
+    EN_PROCESO,
+    CONFIRMADA,
+    RECHAZADA;
 }

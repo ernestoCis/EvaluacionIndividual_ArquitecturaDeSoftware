@@ -4,10 +4,13 @@
  */
 package datos.dao;
 
+import datos.entidades.Inscripcion;
+
 /**
  *
  * @author jesus
  */
-public class IInscripcionDAO {
-    
+public interface IInscripcionDAO {
+    Boolean guardar(Inscripcion inscripcion);
+    Inscripcion obtenerPorMatricula(String matricula);
 }
