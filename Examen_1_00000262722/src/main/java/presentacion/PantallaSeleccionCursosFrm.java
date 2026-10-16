@@ -120,7 +120,7 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         tablaDisponibles.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox(), "Agregar", (row) -> {
             if (row >= 0 && row < listaCatalogo.size()) {
                 Curso seleccionado = listaCatalogo.get(row);
-//                controller.seleccionarCurso(seleccionado.getId());
+                controller.seleccionarCurso(seleccionado.getId());
             }
         }));
 
@@ -161,7 +161,7 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         tablaInscritos.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox(), "Eliminar", (row) -> {
             if (row >= 0 && row < listaInscritos.size()) {
                 Curso aEliminar = listaInscritos.get(row);
-//                controller.deseleccionarCurso(aEliminar.getId());
+                controller.deseleccionarCurso(aEliminar.getId());
             }
         }));
 
@@ -196,7 +196,7 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         btnFinalizar.setFocusPainted(false);
         btnFinalizar.setPreferredSize(new Dimension(200, 38));
         btnFinalizar.setEnabled(false);
-//        btnFinalizar.addActionListener(e -> onFinalizarClicked());
+        btnFinalizar.addActionListener(e -> onFinalizarClicked());
 
         JPanel panelBtnContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelBtnContainer.setBackground(grisFondoPanel);
@@ -266,11 +266,11 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         lblTotalMonto.setText(monedaFormat.format(total));
     }
 
-//    private void onFinalizarClicked() {
-//        if (controller != null) {
-//            controller.confirmarInscripcion("2024001"); // Matrícula de prueba del estudiante
-//        }
-//    }
+    private void onFinalizarClicked() {
+        if (controller != null) {
+            controller.confirmarInscripcion("2024001"); // Matrícula de prueba del estudiante
+        }
+    }
 
 
     private JPanel createCardPanel(Color borderCol) {

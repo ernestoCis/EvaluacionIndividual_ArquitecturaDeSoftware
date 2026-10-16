@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import negocio.controladores.InscripcionController;
 
 /**
  * 
@@ -25,6 +26,7 @@ public class PantallaFichaPagoFrm extends JFrame {
 
     private final NumberFormat monedaFormat = NumberFormat.getCurrencyInstance(Locale.US);
     private final DateTimeFormatter fechaFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy   hh:mm a");
+    private final InscripcionController controller;
 
     private JLabel lblNombreVal;
     private JLabel lblMatriculaVal;
@@ -38,11 +40,12 @@ public class PantallaFichaPagoFrm extends JFrame {
     private FichaPago fichaActual;
 
     public PantallaFichaPagoFrm() {
-        this(null);
+        this(null, null);
     }
 
-    public PantallaFichaPagoFrm(FichaPago ficha) {
+    public PantallaFichaPagoFrm(FichaPago ficha, InscripcionController controller) {
         this.fichaActual = ficha;
+        this.controller = controller;
         initComponents();
         this.setLocationRelativeTo(null);
     }
@@ -286,6 +289,9 @@ public class PantallaFichaPagoFrm extends JFrame {
 
     private void volverAlInicio() {
         this.dispose();
+        if (controller != null) {
+            controller.reiniciarInscripcion();
+        }
     }
 
 
