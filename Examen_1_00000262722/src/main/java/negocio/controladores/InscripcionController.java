@@ -8,8 +8,11 @@ import datos.entidades.Alumno;
 import datos.entidades.Curso;
 import datos.entidades.FichaPago;
 import datos.entidades.Inscripcion;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import negocio.observer.IInscripcionObserver;
+import negocio.observer.IObservable;
 import negocio.servicios.InscripcionService;
 import presentacion.PantallaFichaPagoFrm;
 import presentacion.PantallaSeleccionCursosFrm;
@@ -18,10 +21,12 @@ import presentacion.PantallaSeleccionCursosFrm;
  *
  * @author jesus
  */
-public class InscripcionController {
+public class InscripcionController implements IObservable{
     private final InscripcionService service;
     private PantallaSeleccionCursosFrm vista;
     private final Inscripcion inscripcion;
+    
+    private final List<IInscripcionObserver> observadores = new ArrayList<>();
     
     public InscripcionController(InscripcionService service) {
         this.service = service;
@@ -32,6 +37,7 @@ public class InscripcionController {
     
     public void setVista(PantallaSeleccionCursosFrm vista) {
         this.vista = vista;
+        agregarObservador(vista);
     }
     
     public List<Curso> obtenerCursosDisponibles() {
@@ -40,16 +46,12 @@ public class InscripcionController {
     
     public void seleccionarCurso(String idCurso) {
         service.agregarCurso(inscripcion, idCurso);
-        if (vista != null) {
-            vista.actualizarResumen(inscripcion.obtenerCursos(), inscripcion.getTotal());
-        }
+        notificarObservadores();
     }
     
     public void deseleccionarCurso(String idCurso) {
         service.eliminarCurso(inscripcion, idCurso);
-        if (vista != null) {
-            vista.actualizarResumen(inscripcion.obtenerCursos(), inscripcion.getTotal());
-        }
+        notificarObservadores();
     }
     
     public FichaPago confirmarInscripcion(String matricula) {
@@ -79,5 +81,24 @@ public class InscripcionController {
         nuevoController.setVista(nuevaVista);
         nuevaVista.mostrarCatalogo(nuevoController.obtenerCursosDisponibles());
         nuevaVista.setVisible(true);
+    }
+
+    @Override
+    public void agregarObservador(IInscripcionObserver observador) {
+        if (observador != null && !observadores.contains(observador)) {
+            observadores.add(observador);
+        }
+    }
+
+    @Override
+    public void eliminarObservador(IInscripcionObserver observador) {
+        observadores.remove(observador);
+    }
+
+    @Override
+    public void notificarObservadores() {
+        for (IInscripcionObserver obs : observadores) {
+            obs.actualizar(inscripcion);
+        }
     }
 }

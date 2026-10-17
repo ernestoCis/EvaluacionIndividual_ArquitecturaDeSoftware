@@ -1,6 +1,7 @@
 package presentacion;
 
 import datos.entidades.Curso;
+import datos.entidades.Inscripcion;
 import negocio.controladores.InscripcionController;
 
 import javax.swing.*;
@@ -14,12 +15,13 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import negocio.observer.IInscripcionObserver;
 
 /**
  *
  * @author jesus
  */
-public class PantallaSeleccionCursosFrm extends JFrame {
+public class PantallaSeleccionCursosFrm extends JFrame implements IInscripcionObserver{
 
     private final InscripcionController controller;
     private final NumberFormat monedaFormat = NumberFormat.getCurrencyInstance(Locale.US);
@@ -344,6 +346,13 @@ public class PantallaSeleccionCursosFrm extends JFrame {
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         tabla.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         tabla.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+    }
+
+    @Override
+    public void actualizar(Inscripcion inscripcion) {
+        if (inscripcion != null) {
+            actualizarResumen(inscripcion.obtenerCursos(), inscripcion.getTotal());
+        }
     }
 
     // Renderizador y Editor de Botones dentro de la Tabla
